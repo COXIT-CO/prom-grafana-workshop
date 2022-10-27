@@ -1,0 +1,21 @@
+server:
+  http_listen_port: 9080 # HTTP server listen port
+  grpc_listen_port: 0 # gRPC server listen host
+
+# Describes how to save read file offsets to disk
+positions:
+  filename: /tmp/positions.yaml # Location of positions file
+
+# The clients block configures how Promtail connects to instances of Loki:
+clients:
+  - url:  http://<loki_adress>/loki/api/v1/push # The URL where Loki is listening
+
+# The scrape_configs block configures how Promtail can scrape logs from a series of targets
+scrape_configs:
+- job_name: apache # Name to identify this scrape config in the Promtail UI.
+  static_configs: # Static targets to scrape.
+  - targets: # allows specifying a list of targets and a common label set for them.
+      - target
+    labels: # Defines a file to scrape and an optional set of additional labels to apply to all streams defined by the files from __path__.
+      job: job_name
+      __path__: path # The path to load logs from. Can use glob patterns (e.g., /var/log/*.log).

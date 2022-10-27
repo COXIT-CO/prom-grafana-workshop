@@ -1,0 +1,46 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+# Common configuration to be shared between multiple modules.
+# If a more specific configuration is given in other sections,
+# the related configuration within this section will be ignored.
+common:
+  path_prefix: /loki  # When defined, the given prefix will be present in front of the endpoint paths.
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rulesі
+  replication_factor: 3 # How many times incoming data should be replicated to the ingester component.
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config: # Configures the chunk index schema and where it is stored.
+  configs: # block configures what index schemas should be used for from specific time periods.
+    - from: 2022-09-01  # The date of the first day that index buckets should be created.
+      store: boltdb-shipper # Which store to use for the index. Either aws, aws-dynamo, gcp, bigtable, bigtable-hashed, cassandra, boltdb or boltdb-shipper.
+      object_store: filesystem # Which store to use for the chunks. Either aws, azure, gcp, bigtable, gcs, cassandra, swift or filesystem. If omitted, defaults to the same value as store.
+      schema: v11 # The schema version to use, current recommended schema is v11.
+      index: # Configures how the index is updated and stored.
+        prefix: index_ # Table prefix for all period tables
+        period: 24h # Table period.
+
+limits_config:
+  reject_old_samples: true
+  # maximum sample age before rejecting [7 days]
+  reject_old_samples_max_age: 168h
+  max_query_length: 721h
+  retention_period: 745h
+
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor  # Directory where files can be downloaded for compaction.
+  shared_store: filesystem  # The shared store used for storing boltdb files.
+  compaction_interval: 5m  # Interval at which to re-run the compaction operation (or retention if enabled).
+  retention_enabled: true  #Activate custom (per-stream,per-tenant) retention.
+  retention_delete_delay: 2h  # Delay after which chunks will be fully deleted during retention.
+
+
+ruler:
+  alertmanager_url: http://localhost:9093
