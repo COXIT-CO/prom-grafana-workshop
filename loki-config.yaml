@@ -12,7 +12,7 @@ common:
     filesystem:
       chunks_directory: /loki/chunks
       rules_directory: /loki/rulesі
-  replication_factor: 3 # How many times incoming data should be replicated to the ingester component.
+  replication_factor: 1 # How many times incoming data should be replicated to the ingester component.
   ring:
     kvstore:
       store: inmemory
